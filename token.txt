@@ -1,2 +1,4 @@
 Discord Bot Token - 
 MTIwNTUwNDgyNTY0MzYzODgyNA.GTFW-p.Ry4JfdZdomd-7fjZRnv7lLxaSgTvZNGvyhHDko
+OpenAi Key-
+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

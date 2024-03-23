@@ -1,18 +1,39 @@
-def find_duplicates(lst):
-    duplicates = {}
-    for i, item in enumerate(lst):
-        if item in duplicates:
-            duplicates[item].append(i)
-        else:
-            duplicates[item] = [i]
+from openai import OpenAI
+import time
 
-    result = {item: indices for item, indices in duplicates.items() if len(indices) > 1}
-    return result
+client = OpenAI(api_key="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")
 
+assistant = client.beta.assistants.create(
+    name = "Academic Ally",
+    instructions = "You are a math tutor",
+    tools = [{"type": "code_interpreter"}],
+    model = "gpt-3.5-turbo",
+)
 
-# Example usage
-my_list = [1, 2, 3, 4, 2, 5, 3, 6]
-duplicates_indices = find_duplicates(my_list)
+thread = client.beta.threads.create()
 
-for item, indices in duplicates_indices.items():
-    print(f"Item {item} is duplicated at indices: {indices}")
+message = client.beta.threads.messages.create(
+    thread_id = thread.id,
+    role = "user",
+    content = input("User: "),
+)
+
+run = client.beta.threads.runs.create(
+    thread_id = thread.id,
+    assistant_id = assistant.id,
+    instructions="Address the user as Sam",
+)
+
+while run.status in ['queued', 'in_progress', 'cancelling']:
+    time.sleep(1) # Wait for 1 second
+    run = client.beta.threads.runs.retrieve(
+        thread_id=thread.id,
+        run_id=run.id
+    )
+
+    if run.status == 'completed':
+        messages = client.beta.threads.messages.list(
+            thread_id=thread.id)
+        print(messages)
+    else:
+        print(run.status)
