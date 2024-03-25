@@ -1,7 +1,7 @@
 import requests
 import discord
 import re
-
+import datetime
 
 username = ""
 password = ""
@@ -113,6 +113,29 @@ def average(key):
     return avg
 
 
+def transcript(key):
+    response = {}
+    year = datetime.date.today()
+    year = year.year
+    data = key["studentTranscript"]
+    for index in data:
+        print(index)
+        courses = index["courses"]
+        for index_2 in courses:
+            print(index_2)
+            if not index_2["sem1Grade"] == "":
+                if response["yearsAttended"] == "":
+                    response["yearsAttended"] = response[index_2["courseName"] + "sem_1"] = index_2["sem1Grade"]
+                else:
+                    response["yearsAttended"] = response[index_2["courseName"] + "sem_1"] = index_2["sem1Grade"]
+
+            if not index_2["sem2Grade"] == "":
+                if response["yearsAttended"] == "":
+                    response["yearsAttended"] = response[index_2["courseName"] + "sem_2"] = index_2["sem2Grade"]
+                else:
+                    response["yearsAttended"] = response[index_2["courseName"] + "sem_2"] = index_2["sem2Grade"]
+    return response
+
 class MyClient(discord.Client):
 
     async def on_ready(self):
@@ -151,6 +174,7 @@ class MyClient(discord.Client):
                 info = ""
                 return
 
+print(transcript(accesshac("304551", "DEBA1243$", "transcript", 0)))
 
 intents = discord.Intents.default()
 intents.message_content = True
