@@ -117,23 +117,25 @@ def transcript(key):
     response = {}
     year = datetime.date.today()
     year = year.year
+    quarter = 1
     data = key["studentTranscript"]
     for index in data:
-        print(index)
         courses = index["courses"]
         for index_2 in courses:
-            print(index_2)
+            temp = {}
             if not index_2["sem1Grade"] == "":
-                if response["yearsAttended"] == "":
-                    response["yearsAttended"] = response[index_2["courseName"] + "sem_1"] = index_2["sem1Grade"]
-                else:
-                    response["yearsAttended"] = response[index_2["courseName"] + "sem_1"] = index_2["sem1Grade"]
+                try:
+                    response[index["yearsAttended"]][index_2["courseName"] + "_sem_1"] = index_2["sem1Grade"]
+                except:
+                    temp[index_2["courseName"] + "_sem_1"] = index_2["sem1Grade"]
+                    response[index["yearsAttended"]] = temp
 
             if not index_2["sem2Grade"] == "":
-                if response["yearsAttended"] == "":
-                    response["yearsAttended"] = response[index_2["courseName"] + "sem_2"] = index_2["sem2Grade"]
-                else:
-                    response["yearsAttended"] = response[index_2["courseName"] + "sem_2"] = index_2["sem2Grade"]
+                try:
+                    response[index["yearsAttended"]][index_2["courseName"] + "_sem_2"] = index_2["sem2Grade"]
+                except:
+                    temp[index_2["courseName"] + "_sem_2"] = index_2["sem2Grade"]
+                    response[index["yearsAttended"]] = temp
     return response
 
 class MyClient(discord.Client):
