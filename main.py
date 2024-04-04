@@ -3,6 +3,8 @@ import discord
 import re
 import datetime
 
+year = datetime.date.today()
+year = str(year.year)
 username = ""
 password = ""
 info = ""
@@ -57,47 +59,52 @@ def subjectname(key):
 
 
 def getgrades(username_procedure, password_procedure):
-    grades = []
-    for i in range(1, 5):
-        response = accesshac(username_procedure, password_procedure, "pastclasses", i)
-        data = response["pastClasses"]
+    grades = transcript(accesshac(username_procedure, password_procedure, "transcript", 0))
+    a = int(grades["sem"])
+
+    for i in range(a, 5):
+        data = accesshac(username_procedure, password_procedure, "pastclasses", i)
+        data = data["pastClasses"]
+
         if grades:
             subname = subjectname(grades)
             for subject in data:
                 if subject["name"] in subname:
-                    x = int(subname.index(subject["name"]))
-                    grades[x].append(subject["grade"])
+                    grades[subject["name"]].append(subject["grade"])
                 else:
-                    grades.append([subject["name"], subject["grade"]])
+                    grades[subject["name"]] = [subject["grade"]]
+
         else:
             for subject in data:
-                grades.append([subject["name"], subject["grade"]])
+                grades[subject["name"]].append(subject["grade"])
     return grades
 
 
 def gpa(username_procedure, password_procedure):
     key = getgrades(username_procedure, password_procedure)
+    hac = hacgpa(username_procedure, password_procedure)
+    a = 0
     data = 0
     for index in key:
-        if re.search("Adv", index[0]):
-            del index[0]
-            x = 100 - average(index)
-            x = x/10
-            y = 5.5 - x
-            data = data + y
-        elif re.search("AP", index[0]):
-            del index[0]
-            x = 100 - average(index)
-            x = x/10
-            y = 6 - x
-            data = data + y
-        else:
-            del index[0]
-            x = 100 - average(index)
-            x = x/10
-            y = 5 - x
-            data = data + y
-    data = round(data/len(key), 8)
+        if not index == "sem" and not ("0.00" in key[index]):
+            if re.search("Adv", index):
+                x = 100 - average(key[index])
+                x = x/10
+                y = 5.5 - x
+                data = data + y
+            elif re.search("AP", index):
+                x = 100 - average(key[index])
+                x = x/10
+                y = 6 - x
+                data = data + y
+            else:
+                x = 100 - average(key[index])
+                x = x/10
+                y = 5 - x
+                data = data + y
+            a = a + 1
+    data = round(data/a, 8)
+    data = "Acutal GPA:" + str(data) + hac
     return data
 
 
@@ -105,38 +112,47 @@ def average(key):
     response = 0
     i = 0
     for index in key:
-        if index == "" or index == "0.00":
-            break
-        response = response + round(float(index), 2)
-        i = i + 1
+        isnull = not (index == "" or index == "0.00" or index == ".00")
+        if isnull:
+            response = response + round(float(index), 2)
+            i = i + 1
     avg = round(response/i, 2)
     return avg
 
 
 def transcript(key):
+    sem_1 = True
     response = {}
-    year = datetime.date.today()
-    year = year.year
-    quarter = 1
     data = key["studentTranscript"]
+
     for index in data:
         courses = index["courses"]
         for index_2 in courses:
-            temp = {}
-            if not index_2["sem1Grade"] == "":
+            if index_2["sem1Grade"] == "":
+                if re.search(year, str(index["yearsAttended"])):
+                    if sem_1:
+                        response["sem"] = 1
+                    else:
+                        response["sem"] = 3
+            else:
                 try:
-                    response[index["yearsAttended"]][index_2["courseName"] + "_sem_1"] = index_2["sem1Grade"]
+                    response[index_2["courseName"]].append(index_2["sem1Grade"])
                 except:
-                    temp[index_2["courseName"] + "_sem_1"] = index_2["sem1Grade"]
-                    response[index["yearsAttended"]] = temp
-
-            if not index_2["sem2Grade"] == "":
+                    response[index_2["courseName"]] = [index_2["sem1Grade"]]
+            if index_2["sem2Grade"] == "":
+                if re.search(year, str(index["yearsAttended"])):
+                    if sem_1:
+                        response["sem"] = 1
+                    else:
+                        response["sem"] = 3
+            else:
+                sem_1 = False
                 try:
-                    response[index["yearsAttended"]][index_2["courseName"] + "_sem_2"] = index_2["sem2Grade"]
+                    response[index_2["courseName"]].append(index_2["sem2Grade"])
                 except:
-                    temp[index_2["courseName"] + "_sem_2"] = index_2["sem2Grade"]
-                    response[index["yearsAttended"]] = temp
+                    response[index_2["courseName"]] = [index_2["sem2Grade"]]
     return response
+
 
 class MyClient(discord.Client):
 
@@ -176,7 +192,6 @@ class MyClient(discord.Client):
                 info = ""
                 return
 
-print(transcript(accesshac("304551", "DEBA1243$", "transcript", 0)))
 
 intents = discord.Intents.default()
 intents.message_content = True
