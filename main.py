@@ -2,6 +2,7 @@ import requests
 import discord
 import re
 import datetime
+import maskpass
 
 year = datetime.date.today()
 year = str(year.year)
@@ -52,15 +53,19 @@ def hacgpa(username_procedure, password_procedure):
 
 
 def subjectname(key):
-    data = []
+    response = []
     for index in key:
-        data.append(index[0])
-    return data
+        response.append(index)
+    return response
 
 
 def getgrades(username_procedure, password_procedure):
-    grades = transcript(accesshac(username_procedure, password_procedure, "transcript", 0))
+    try:
+        grades = transcript(accesshac(username_procedure, password_procedure, "transcript", 0))
+    except:
+        grades = []
     a = int(grades["sem"])
+    grades.pop("sem", None)
 
     for i in range(a, 5):
         data = accesshac(username_procedure, password_procedure, "pastclasses", i)
@@ -76,7 +81,7 @@ def getgrades(username_procedure, password_procedure):
 
         else:
             for subject in data:
-                grades[subject["name"]].append(subject["grade"])
+                grades[subject["name"]] = [(subject["grade"])]
     return grades
 
 
@@ -86,23 +91,31 @@ def gpa(username_procedure, password_procedure):
     a = 0
     data = 0
     for index in key:
-        if not index == "sem" and not ("0.00" in key[index]):
+        if not index == "sem":
             if re.search("Adv", index):
-                x = 100 - average(key[index])
-                x = x/10
-                y = 5.5 - x
-                data = data + y
+                z = average(key[index])
+                if not (z is None):
+                    x = 100 - z
+                    x = x/10
+                    y = 5.5 - x
+                    data = data + y
+                    a = a + 1
             elif re.search("AP", index):
-                x = 100 - average(key[index])
-                x = x/10
-                y = 6 - x
-                data = data + y
+                z = average(key[index])
+                if not (z is None):
+                    x = 100 - z
+                    x = x/10
+                    y = 6 - x
+                    data = data + y
+                    a = a + 1
             else:
-                x = 100 - average(key[index])
-                x = x/10
-                y = 5 - x
-                data = data + y
-            a = a + 1
+                z = average(key[index])
+                if not (z is None):
+                    x = 100 - z
+                    x = x/10
+                    y = 5 - x
+                    data = data + y
+                    a = a + 1
     data = round(data/a, 8)
     data = "Acutal GPA:" + str(data) + hac
     return data
@@ -111,19 +124,25 @@ def gpa(username_procedure, password_procedure):
 def average(key):
     response = 0
     i = 0
-    for index in key:
-        isnull = not (index == "" or index == "0.00" or index == ".00")
-        if isnull:
-            response = response + round(float(index), 2)
-            i = i + 1
-    avg = round(response/i, 2)
-    return avg
+    try:
+        for index in key:
+            temp = float(index)
+            if not (temp == 0 or temp == 0.00 or temp == .00):
+                response = temp + response
+                i += 1
+        avg = round(float(response/i))
+        return avg
+    except ZeroDivisionError:
+        return None
+    except ValueError:
+        return None
 
 
 def transcript(key):
     sem_1 = True
     response = {}
     data = key["studentTranscript"]
+    response["sem"] = 1
 
     for index in data:
         courses = index["courses"]
@@ -137,7 +156,7 @@ def transcript(key):
             else:
                 try:
                     response[index_2["courseName"]].append(index_2["sem1Grade"])
-                except:
+                except KeyError:
                     response[index_2["courseName"]] = [index_2["sem1Grade"]]
             if index_2["sem2Grade"] == "":
                 if re.search(year, str(index["yearsAttended"])):
@@ -149,10 +168,11 @@ def transcript(key):
                 sem_1 = False
                 try:
                     response[index_2["courseName"]].append(index_2["sem2Grade"])
-                except:
+                except KeyError:
                     response[index_2["courseName"]] = [index_2["sem2Grade"]]
     return response
 
+""" 
 
 class MyClient(discord.Client):
 
@@ -198,3 +218,18 @@ intents.message_content = True
 
 client = MyClient(intents=intents)
 client.run("MTIwNTUwNDgyNTY0MzYzODgyNA.GTFW-p.Ry4JfdZdomd-7fjZRnv7lLxaSgTvZNGvyhHDko")
+"""
+
+run = True
+
+while run:
+    input_user = input("Calculate gpa(Y/N): ")
+    if input_user == "n" or input_user == "N":
+        run = False
+    elif input_user == "y" or input_user == "Y":
+        username = maskpass.askpass(prompt="Enter username: ", mask="*")
+        password = maskpass.askpass(prompt="Enter password: ", mask="*")
+        print(gpa(username, password))
+    else:
+        print("Invalid input")
+print("Program stopped")
