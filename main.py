@@ -29,11 +29,11 @@ def findstr(key):
 
 def accesshac(username_procedure, password_procedure, info_info, quarter_procedure):
     if quarter_procedure == 0:
-        response = requests.get("https://friscoisdhacapi.vercel.app/api/" + str(info_info) + "?username=" +
+        response = requests.post("https://friscoisdhacapi.vercel.app/api/" + str(info_info) + "?username=" +
                                 str(username_procedure) +
                                 "&password=" + str(password_procedure))
     else:
-        response = requests.get("https://friscoisdhacapi.vercel.app/api/" + str(info_info) + "?username=" +
+        response = requests.post("https://friscoisdhacapi.vercel.app/api/" + str(info_info) + "?username=" +
                                 str(username_procedure) +
                                 "&password=" + str(password_procedure) + "&quarter=" + str(quarter_procedure))
     data = response.json()
