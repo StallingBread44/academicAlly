@@ -19,6 +19,12 @@ nav a:hover {
     text-decoration: underline;
 }
 
+nav a:active {
+    text-decoration: none;
+    color: blue;
+    background-color: #333333;
+}
+
 /* CSS for dropdown */
 .dropdown {
     float: left;

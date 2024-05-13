@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+    <h1 class="title">Todos</h1>
+    <a href="{{ url_for('home') }}" class="btn del-btn">Cancle</a>
+        <form action="" method="POST">
+            <input type="text" class="todo-input" name="userInput" id="" required>
+            <input type="submit" class="btn add-btn from-submit" value="Add">
+        </form>
+    </div>
+</body>
+</html>

@@ -1,18 +1,18 @@
-def find_duplicates(lst):
-    duplicates = {}
-    for i, item in enumerate(lst):
-        if item in duplicates:
-            duplicates[item].append(i)
-        else:
-            duplicates[item] = [i]
+from flask import Flask, render_template, request, redirect, url_for
 
-    result = {item: indices for item, indices in duplicates.items() if len(indices) > 1}
-    return result
+app = Flask(__name__)
+
+todos = {}
 
 
-# Example usage
-my_list = [1, 2, 3, 4, 2, 5, 3, 6]
-duplicates_indices = find_duplicates(my_list)
+@app.get('/')
+def home():
+    return render_template('Website.html', todos = todos)
 
-for item, indices in duplicates_indices.items():
-    print(f"Item {item} is duplicated at indices: {indices}")
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        print(request.form.get('userInput'))
+        return redirect(url_for('home'))
+    return render_template('Website.html')
