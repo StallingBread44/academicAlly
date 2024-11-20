@@ -1,11 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from getSession import _getsession
-from login import _login
-from logoff import _logoff
-
-s = _getsession()
+from api.getSession import _getsession
+from api.login import _login
+from api.logoff import _logoff
 
 
 def _transcript(session):
@@ -50,10 +48,4 @@ def _transcript(session):
             break
         x = x + 1
         """
-    print(data)
     return data
-
-
-_login('304551', 'DEBA1243$', s)
-_transcript(s)
-_logoff(s)

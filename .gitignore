@@ -1,0 +1,9 @@
+.venv
+ssh_key
+ssh_key.pub
+.DS_Store
+.git
+assignments_returnhtml.txt
+.idea
+.pyc
+__pycache__
