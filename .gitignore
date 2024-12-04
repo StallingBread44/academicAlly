@@ -7,3 +7,4 @@ assignments_returnhtml.txt
 .idea
 .pyc
 __pycache__
+api/__pycache__

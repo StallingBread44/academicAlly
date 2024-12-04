@@ -247,10 +247,9 @@ print(_hacgpa(s))
 
             
 """
-
 session = _getsession()
 if _login('304551', 'DEBA1243$', session):
-	_transcript(session)
+	print(_hacgpa(session))
 else:
 	print("Error")
 _logoff(session)

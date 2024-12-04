@@ -11,8 +11,8 @@ def _login(username_procedure, password_procedure, session):
 
     data = {
         '__RequestVerificationToken': token,
-        'Database': '10',
         'VerificationOption': 'UsernamePassword',
+        'database': '10',
         'LogOnDetails.UserName': username_procedure,
         'LogOnDetails.Password': password_procedure,
         'SCKTY00328510CustomEnabled': False,
