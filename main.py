@@ -11,6 +11,10 @@ from api.logoff import _logoff
 from api.transcript import _transcript
 from flask import Flask, render_template, request, url_for, redirect
 
+#The following commented code was made for a AP Computer Science final project
+#Or its just stuff I messed around with
+#Anyways just ignore the commented stuff
+
 """
 
 year = datetime.date.today()
@@ -247,10 +251,20 @@ print(_hacgpa(s))
 
             
 """
+
+#Heres where the actual procedures and methods get called
+#The number is the student id, and the next one is the password
+#The login info does work, pls dont leak
+#Right now the code simply prints the gpa information that is available on hac
+#Doesn't print real time gpa
+
+
 session = _getsession()
 if _login('304551', 'DEBA1243$', session):
 	print(_hacgpa(session))
 else:
 	print("Error")
 _logoff(session)
+
+#Make sure to logoff after your done with the session
 
